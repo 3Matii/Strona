@@ -2,19 +2,48 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Moja Strona</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAN ANDREAS FIRE RESCUE</title>
+    <link rel="icon" type="image/x-icon" href="img/logo.png">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <nav>
-        <ul>
-            <li><a href="#">Opcja 1</a></li>
-            <li><a href="#">Opcja 2</a></li>
-            <li><a href="#">Opcja 3</a></li>
+        <ul class="menu-left">
+            <li><a href="index.html">GŁÓWNA</a></li>
+            <li><a href="kategoria/onas/onas.html">O NAS</a></li>
+            <li><a href="kategoria/news/news.html">NEWS</a></li>
+            <li><a href="kategoria/kontakt/kontakt.html">KONTAKT</a></li>
+        </ul>
+        <ul class="menu-right">
+            <li>
+                <a href="https://discord.gg/everway-rp" target="_blank" rel="noopener noreferrer">
+                    APLIKACJA
+                </a>
+            </li>
         </ul>
     </nav>
+    <div class="spacer"></div>
+    <div class="big-title">
+        SAN ANDREAS <span class="highlight">FIRE RESCUE</span>
+    </div>
     <div class="logo-container">
         <img src="img/logo.png" alt="Logo">
     </div>
+    <script>
+    // Tablica ze ścieżkami do zdjęć tła
+    const backgrounds = [
+        'img/background.png',
+        'img/background2.png',
+    ];
+    let current = 0;
+
+    function changeBackground() {
+        document.body.style.backgroundImage = "url('" + backgrounds[current] + "')";
+        current = (current + 1) % backgrounds.length;
+    }
+    changeBackground();
+    setInterval(changeBackground, 5000); // zmiana co 5 sekund
+    </script>
 </body>
 </html>
