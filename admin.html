@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel admina</title>
+    <link rel="icon" type="image/x-icon" href="img/logo.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+        <ul class="menu-left">
+            <li><a href="index.html">GŁÓWNA</a></li>
+            <li><a href="informacje.html">INFORMACJE</a></li>
+            <li><a href="kontakt.html">KONTAKT</a></li>
+        </ul>
+        <ul class="menu-right">
+            <li>
+                <a href="https://discord.gg/everway-rp" target="_blank" rel="noopener noreferrer">
+                    APLIKACJA
+                </a>
+            </li>
+            <li style="position:relative;">
+                <span class="adm-btn" id="adm-btn" tabindex="0">ADM</span>
+                  <span class="adm-tooltip" id="adm-tooltip" tabindex="0">Zaloguj się</span>
+            </li>
+        </ul>
+    </nav>
+    
+    <div class="spacer"></div>
+    <div class="big-title">
+        PANEL <span class="highlight">ADMINA</span>
+    </div>
+    <section class="news-section">
+        <!-- Panel logowania -->
+        <form id="login-form">
+            <input type="text" id="login-username" placeholder="Login" required>
+            <input type="password" id="login-password" placeholder="Hasło" required>
+            <button type="submit">Zaloguj się</button>
+            <div id="login-error" class="login-error"></div>
+        </form>
+        <!-- Panel admina pojawi się po zalogowaniu -->
+        <div id="admin-panel" style="display:none;">
+            <h2 id="form-title">Dodaj nowy post</h2>
+            <form id="news-form" enctype="multipart/form-data">
+                <input type="hidden" id="edit-index" value="">
+                <input type="text" id="news-title" placeholder="Tytuł newsa" required>
+                <textarea id="news-content" placeholder="Treść newsa" required></textarea>
+                <label>Dodaj zdjęcie:
+                    <input type="file" id="news-image-file" accept="image/*">
+                </label>
+                <span style="margin: 8px 0;">lub</span>
+                <input type="url" id="news-image-link" placeholder="Link do zdjęcia (https://...)">
+                <button type="submit">Zapisz</button>
+                <button type="button" id="cancel-edit" style="display:none;margin-top:10px;">Anuluj edycję</button>
+            </form>
+            <div class="news-list" id="admin-news-list">
+                <!-- Lista newsów do podglądu -->
+            </div>
+        </div>
+    </section>
+
+    <script>
+    const ADMIN_LOGIN = "SAFRZ";
+    const ADMIN_PASS = "1SAFR1";
+
+    // Obsługa logowania
+    const loginForm = document.getElementById('login-form');
+    const adminPanel = document.getElementById('admin-panel');
+    const loginError = document.getElementById('login-error');
+
+    if (localStorage.getItem('isAdmin') === "true") {
+        loginForm.style.display = "none";
+        adminPanel.style.display = "block";
+    }
+
+    loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const username = document.getElementById('login-username').value;
+        const password = document.getElementById('login-password').value;
+        if (username === ADMIN_LOGIN && password === ADMIN_PASS) {
+            localStorage.setItem('isAdmin', "true");
+            window.location.reload();
+        } else {
+            loginError.textContent = "Nieprawidłowy login lub hasło!";
+        }
+    });
+
+    // Obsługa newsów z obsługą zdjęć, edycją i usuwaniem
+    function getNews() {
+        return JSON.parse(localStorage.getItem('newsList') || '[]');
+    }
+    function saveNews(news) {
+        localStorage.setItem('newsList', JSON.stringify(news));
+    }
+    function renderAdminNews() {
+        const newsList = getNews();
+        const newsListDiv = document.getElementById('admin-news-list');
+        newsListDiv.innerHTML = '';
+        newsList.slice().reverse().forEach((news, i) => {
+            // Odwrócony indeks, bo wyświetlamy od najnowszego
+            const realIndex = newsList.length - 1 - i;
+            const article = document.createElement('article');
+            article.className = 'news-item';
+            let imgHtml = news.image ? `<img src="${news.image}" class="news-img" alt="Zdjęcie newsa">` : '';
+            article.innerHTML = `
+                ${imgHtml}
+                <h3>${news.title}</h3>
+                <p>${news.content}</p>
+                <span class="news-date">${news.date}</span>
+                <div class="admin-actions">
+                    <button class="edit-btn" data-index="${realIndex}">Edytuj</button>
+                    <button class="delete-btn" data-index="${realIndex}">Usuń</button>
+                </div>
+            `;
+            newsListDiv.appendChild(article);
+        });
+
+        // Obsługa edycji
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                startEditNews(this.getAttribute('data-index'));
+            });
+        });
+        // Obsługa usuwania
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (confirm('Na pewno usunąć ten post?')) {
+                    deleteNews(this.getAttribute('data-index'));
+                }
+            });
+        });
+    }
+
+    function startEditNews(index) {
+        const newsList = getNews();
+        const news = newsList[index];
+        document.getElementById('form-title').textContent = 'Edytuj post';
+        document.getElementById('edit-index').value = index;
+        document.getElementById('news-title').value = news.title;
+        document.getElementById('news-content').value = news.content;
+        document.getElementById('news-image-file').value = '';
+        document.getElementById('news-image-link').value = '';
+        document.getElementById('cancel-edit').style.display = 'inline-block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function deleteNews(index) {
+        const newsList = getNews();
+        newsList.splice(index, 1);
+        saveNews(newsList);
+        renderAdminNews();
+        resetForm();
+    }
+
+    function resetForm() {
+        document.getElementById('form-title').textContent = 'Dodaj nowy post';
+        document.getElementById('edit-index').value = '';
+        document.getElementById('news-title').value = '';
+        document.getElementById('news-content').value = '';
+        document.getElementById('news-image-file').value = '';
+        document.getElementById('news-image-link').value = '';
+        document.getElementById('cancel-edit').style.display = 'none';
+    }
+
+    document.getElementById('cancel-edit').addEventListener('click', function() {
+        resetForm();
+    });
+
+    const newsForm = document.getElementById('news-form');
+    if(newsForm){
+        newsForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const title = document.getElementById('news-title').value.trim();
+            const content = document.getElementById('news-content').value.trim();
+            const fileInput = document.getElementById('news-image-file');
+            const linkInput = document.getElementById('news-image-link');
+            const editIndex = document.getElementById('edit-index').value;
+            let image = '';
+            // Funkcja, która faktycznie zapisuje (dodaje/edytuje) newsa
+            function saveOrEdit(imageToSave) {
+                let newsList = getNews();
+                const newsObj = {
+                    title,
+                    content,
+                    image: imageToSave,
+                    date: new Date().toLocaleDateString('pl-PL')
+                };
+                if(editIndex !== '') {
+                    // Edycja
+                    const old = newsList[editIndex];
+                    newsObj.date = old.date; // zachowaj datę oryginalną
+                    // Jeśli nie podano nowego obrazka, zostaw stary
+                    if (!imageToSave) newsObj.image = old.image;
+                    newsList[editIndex] = newsObj;
+                } else {
+                    // Dodawanie
+                    newsList.push(newsObj);
+                }
+                saveNews(newsList);
+                renderAdminNews();
+                resetForm();
+            }
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    image = evt.target.result;
+                    saveOrEdit(image);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+                return;
+            } else if (linkInput.value.trim() !== "") {
+                image = linkInput.value.trim();
+            }
+            saveOrEdit(image);
+        });
+        renderAdminNews();
+    }
+
+    // ADM tooltip i logowanie/wylogowanie i panel admina
+    function isAdminLoggedIn() {
+        return localStorage.getItem('isAdmin') === 'true';
+    }
+    const admBtn = document.getElementById('adm-btn');
+    const admTooltip = document.getElementById('adm-tooltip');
+    if (admBtn && admTooltip) {
+        function updateTooltip() {
+            if (isAdminLoggedIn()) {
+                admTooltip.textContent = 'Wyloguj się';
+            } else {
+                admTooltip.textContent = 'Zaloguj się';
+            }
+        }
+        updateTooltip();
+
+        function showTooltip() {
+            admTooltip.style.opacity = 1;
+            admTooltip.style.pointerEvents = 'auto';
+        }
+        function hideTooltip() {
+            admTooltip.style.opacity = 0;
+            admTooltip.style.pointerEvents = 'none';
+        }
+
+        admBtn.addEventListener('mouseenter', showTooltip);
+        admBtn.addEventListener('mouseleave', () => {
+            setTimeout(() => {
+                if (!admTooltip.matches(':hover') && !admBtn.matches(':hover')) {
+                    hideTooltip();
+                }
+            }, 100);
+        });
+
+        admTooltip.addEventListener('mouseenter', showTooltip);
+        admTooltip.addEventListener('mouseleave', () => {
+            setTimeout(() => {
+                if (!admTooltip.matches(':hover') && !admBtn.matches(':hover')) {
+                    hideTooltip();
+                }
+            }, 100);
+        });
+
+        admBtn.addEventListener('focus', showTooltip);
+        admBtn.addEventListener('blur', () => {
+            setTimeout(() => {
+                if (!admTooltip.matches(':hover') && !admBtn.matches(':hover')) {
+                    hideTooltip();
+                }
+            }, 100);
+        });
+
+        admBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (isAdminLoggedIn()) {
+                window.location.href = 'admin.html';
+            }
+        });
+
+        admTooltip.addEventListener('click', (e) => {
+            if (isAdminLoggedIn()) {
+                localStorage.removeItem('isAdmin');
+                updateTooltip();
+                setTimeout(() => window.location.href = 'admin.html', 100);
+            } else {
+                window.location.href = 'admin.html';
+            }
+        });
+    }
+    </script>
+</body>
+</html>

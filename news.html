@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAN ANDREAS FIRE RESCUE</title>
+    <title>Wszystkie newsy</title>
     <link rel="icon" type="image/x-icon" href="img/logo.png">
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="news-archive">
     <nav>
         <ul class="menu-left">
             <li><a href="index.html">GŁÓWNA</a></li>
@@ -28,57 +28,40 @@
     </nav>
     <div class="spacer"></div>
     <div class="big-title">
-        SAN ANDREAS <span class="highlight">FIRE RESCUE</span>
+        ARCHIWUM <span class="highlight">NEWSÓW</span>
     </div>
-    <div class="logo-container">
-        <img src="img/logo.png" alt="Logo">
-    </div>
-
-    <!-- Sekcja Aktualności -->
     <section class="news-section">
-        <h2>Aktualności</h2>
-        <div class="news-row" id="main-news-row">
-            <!-- 3 najnowsze newsy pojawią się tutaj -->
+        <div class="news-row" id="all-news-row">
+            <!-- Wszystkie newsy pojawią się tutaj -->
         </div>
-        <a href="news.html" class="news-more-btn">Zobacz wszystkie newsy</a>
     </section>
-
     <script>
-    // Tło zmieniające się co 5 sekund
-    const backgrounds = [
-        'img/background.png',
-        'img/background2.png',
-    ];
-    let current = 0;
-    function changeBackground() {
-        document.body.style.backgroundImage = "url('" + backgrounds[current] + "')";
-        current = (current + 1) % backgrounds.length;
-    }
-    changeBackground();
-    setInterval(changeBackground, 5000);
-
-    // Wyświetlanie 3 najnowszych newsów ze zdjęciami
+    // Wyświetlanie wszystkich newsów ze zdjęciami
     function getNews() {
         return JSON.parse(localStorage.getItem('newsList') || '[]');
     }
-    function renderMainNews() {
+    function renderAllNews() {
         const newsList = getNews();
-        const newsRow = document.getElementById('main-news-row');
+        const newsRow = document.getElementById('all-news-row');
         newsRow.innerHTML = '';
-        newsList.slice(-3).reverse().forEach(news => {
-            const article = document.createElement('article');
-            article.className = 'news-item';
-            let imgHtml = news.image ? `<img src="${news.image}" class="news-img" alt="Zdjęcie newsa">` : '';
-            article.innerHTML = `
-                ${imgHtml}
-                <h3>${news.title}</h3>
-                <p>${news.content}</p>
-                <span class="news-date">${news.date}</span>
-            `;
-            newsRow.appendChild(article);
-        });
+        if(newsList.length === 0) {
+            newsRow.innerHTML = '<p>Brak newsów.</p>';
+        } else {
+            newsList.slice().reverse().forEach(news => {
+                const article = document.createElement('article');
+                article.className = 'news-item';
+                let imgHtml = news.image ? `<img src="${news.image}" class="news-img" alt="Zdjęcie newsa">` : '';
+                article.innerHTML = `
+                    ${imgHtml}
+                    <h3>${news.title}</h3>
+                    <p>${news.content}</p>
+                    <span class="news-date">${news.date}</span>
+                `;
+                newsRow.appendChild(article);
+            });
+        }
     }
-    renderMainNews();
+    renderAllNews();
 
     // ADM tooltip i logowanie/wylogowanie i panel admina
     function isAdminLoggedIn() {

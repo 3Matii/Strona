@@ -2,9 +2,7 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAN ANDREAS FIRE RESCUE</title>
-    <link rel="icon" type="image/x-icon" href="img/logo.png">
+    <title>Informacje</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -25,25 +23,7 @@
                 <span class="adm-tooltip" id="adm-tooltip" tabindex="0">Zaloguj się</span>
             </li>
         </ul>
-    </nav>
-    <div class="spacer"></div>
-    <div class="big-title">
-        SAN ANDREAS <span class="highlight">FIRE RESCUE</span>
-    </div>
-    <div class="logo-container">
-        <img src="img/logo.png" alt="Logo">
-    </div>
-
-    <!-- Sekcja Aktualności -->
-    <section class="news-section">
-        <h2>Aktualności</h2>
-        <div class="news-row" id="main-news-row">
-            <!-- 3 najnowsze newsy pojawią się tutaj -->
-        </div>
-        <a href="news.html" class="news-more-btn">Zobacz wszystkie newsy</a>
-    </section>
-
-    <script>
+                <script>
     // Tło zmieniające się co 5 sekund
     const backgrounds = [
         'img/background.png',
@@ -55,32 +35,81 @@
         current = (current + 1) % backgrounds.length;
     }
     changeBackground();
-    setInterval(changeBackground, 5000);
+    setInterval(changeBackground, 60000);
+    </script>
+    </nav>
+    <div class="spacer"></div>
+<div class="dymek-dark" id="onas">
+    <h2>O nas</h2>
+    <p>
+        Formularz 
+        Jesteśmy zespołem pasjonatów ratownictwa i bezpieczeństwa. Nasza organizacja działa na rzecz poprawy bezpieczeństwa oraz edukacji społecznej w zakresie pierwszej pomocy.<br>
+        Posiadamy 3 jednastki<br>
+        - Fire Station 51<br>
+        - Los Santos Airport<br>
+        - Sandy Shores<br>
+    </p>
+</div>
+<div class="dymek-dark" id="squad">
+    <h2>Squad</h2>
+    <div class="squad-list">
+        <div class="squad-member">
+            <img src="img/osoba1.png" alt="Michael Saunders">
+            <div class="squad-rank">[51151] Fire Chief</div>
+            <div class="squad-name">Michael Saunders</div>
+        </div>
+        <div class="squad-member">
+            <img src="img/logo.png" alt="SOON">
+            <div class="squad-rank">SOON</div>
+            <div class="squad-name">SOON</div>
+        </div>
+        <div class="squad-member">
+            <img src="img/logo.png" alt="SOON">
+            <div class="squad-rank">SOON</div>
+            <div class="squad-name">SOON</div>
+        </div>
+        <div class="squad-member">
+            <img src="img/logo.png" alt="SOON">
+            <div class="squad-rank">SOON</div>
+            <div class="squad-name">SOON</div>
+        </div>
+        <div class="squad-member">
+            <img src="img/logo.png" alt="SOON">
+            <div class="squad-rank">SOON</div>
+            <div class="squad-name">SOON</div>
+        </div>
+        <div class="squad-member">
+            <img src="img/logo.png" alt="SOON">
+            <div class="squad-rank">SOON</div>
+            <div class="squad-name">SOON</div>
+        </div>
+        <div class="squad-member">
+            <img src="img/logo.png" alt="SOON">
+            <div class="squad-rank">SOON</div>
+            <div class="squad-name">SOON</div>
+        </div>
+        <div class="squad-member">
+            <img src="img/logo.png" alt="SOON">
+            <div class="squad-rank">SOON</div>
+            <div class="squad-name">SOON</div>
+        </div>
+        <div class="squad-member">
+            <img src="img/logo.png" alt="SOON">
+            <div class="squad-rank">SOON</div>
+            <div class="squad-name">SOON</div>
+        </div>
+        <div class="squad-member">
+            <img src="img/logo.png" alt="SOON">
+            <div class="squad-rank">SOON</div>
+            <div class="squad-name">SOON</div>
+        </div>
+    </div>
+</div>
 
-    // Wyświetlanie 3 najnowszych newsów ze zdjęciami
-    function getNews() {
-        return JSON.parse(localStorage.getItem('newsList') || '[]');
-    }
-    function renderMainNews() {
-        const newsList = getNews();
-        const newsRow = document.getElementById('main-news-row');
-        newsRow.innerHTML = '';
-        newsList.slice(-3).reverse().forEach(news => {
-            const article = document.createElement('article');
-            article.className = 'news-item';
-            let imgHtml = news.image ? `<img src="${news.image}" class="news-img" alt="Zdjęcie newsa">` : '';
-            article.innerHTML = `
-                ${imgHtml}
-                <h3>${news.title}</h3>
-                <p>${news.content}</p>
-                <span class="news-date">${news.date}</span>
-            `;
-            newsRow.appendChild(article);
-        });
-    }
-    renderMainNews();
 
-    // ADM tooltip i logowanie/wylogowanie i panel admina
+    </section>
+    <script>
+        // ADM tooltip i logowanie/wylogowanie i panel admina
     function isAdminLoggedIn() {
         return localStorage.getItem('isAdmin') === 'true';
     }
